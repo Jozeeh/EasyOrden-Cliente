@@ -1,0 +1,7 @@
+{
+  "name": "EasyOrden-Cliente",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
