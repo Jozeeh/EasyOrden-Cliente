@@ -1,0 +1,140 @@
+<template>
+    <ion-page>
+        <ion-header :translucent="true">
+            <ion-toolbar class="bgcolor-header">
+                <ion-buttons slot="start">
+                    <ion-back-button text="Atrás" :icon="caretBack"></ion-back-button>
+                </ion-buttons>
+
+                <ion-buttons slot="end">
+                    <ion-menu-button color="light"></ion-menu-button>
+                </ion-buttons>
+                <ion-title>{{this.$route.params.categoria}}</ion-title>
+            </ion-toolbar>
+        </ion-header>
+
+        <ion-content>
+            <div class="contenedor">
+
+                <ion-grid>
+                    <ion-row>
+                        <ion-col size="6" size-xm="6" v-for="(prod, i) in this.$store.state.productos" :key="i" >
+                            <!-- TARJETAS PRODUCTOS -->
+                            <ion-card v-if="prod.categoria === this.$route.params.categoria">
+                                <img alt="Silhouette of mountains" style="width: auto; height: auto;"
+                                    :src="prod.img" />
+                                <ion-card-header>
+                                    <ion-card-subtitle>Bebidas</ion-card-subtitle>
+                                    <ion-card-title>{{ prod.nombre }}</ion-card-title>
+                                </ion-card-header>
+
+                                <ion-card-content>
+                                    <b>Descripcion: </b> {{ prod.descripcion }}
+                                    <br>
+                                    Precio: <b>${{ prod.precio }} </b>
+                                    <br>
+                                    <!-- AGREGAR AL CARRITO -->
+                                    <ion-button color="success" class="btnAgregarCarrito" @click="agregarCarrito(i)">
+                                        Agregar
+                                        <ion-icon aria-hidden="true" slot="start" :ios="cart" :md="cart"></ion-icon>
+                                    </ion-button>
+                                </ion-card-content>
+                            </ion-card>
+                        </ion-col>
+
+                    </ion-row>
+                </ion-grid>
+            </div>
+
+        </ion-content>
+    </ion-page>
+</template>
+
+
+<script>
+import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton } from '@ionic/vue';
+
+import {cart} from 'ionicons/icons';
+
+export default {
+    name: 'InicioPage',
+    components: {
+        IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton
+    },
+    data() {
+        return {
+            cart,
+            Cantidad: 0
+        }
+    },
+    methods:{
+        agregarCarrito(index){
+            var array = this.$store.state.productos
+            var producto 
+            array.forEach(function (prod, i) {
+                if(i===index){
+                    producto = {
+                        nombre: prod.nombre,
+                        precio: prod.precio
+                    }
+                }
+            });
+
+            this.$store.dispatch('agregarCarritoAction', producto)
+
+        }
+    },
+    
+}
+</script>
+
+
+<style scoped>
+/* ESTILOS HEADER */
+.bgcolor-header {
+    --background: #c93e4f;
+    --color: white;
+}
+
+.contenedor {
+    /* border: 1px solid black; */
+    width: 90%;
+    margin: 0 auto;
+}
+
+.btnAgregarCarrito {
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.sltCategorias{
+    text-align: center;
+    background: #E6E6E6;
+}
+
+/* #container {
+  text-align: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#container strong {
+  font-size: 20px;
+  line-height: 26px;
+}
+
+#container p {
+  font-size: 16px;
+  line-height: 22px;
+  color: #8c8c8c;
+  margin: 0;
+}
+
+#container a {
+  text-decoration: none;
+} */
+</style>
