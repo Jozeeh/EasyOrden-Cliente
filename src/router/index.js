@@ -2,11 +2,17 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import InicioPage from '../views/InicioPage.vue'
 import ComidasPage from '../views/categorias-views/ProductosPage.vue'
 import PagoPage from '../views/PagoPage.vue'
+import PedidosPage from '../views/PedidosPage.vue'
+import BarcodeScanner from '../views/BarcodeScanner.vue'
 
 const routes = [
   {
     path: '',
     redirect: '/inicio'
+  },
+  {
+    path: '/scaner',
+    component: BarcodeScanner
   },
   {
     path: '/inicio',
@@ -19,6 +25,10 @@ const routes = [
   {
     path: '/pagar',
     component: PagoPage
+  },
+  {
+    path: '/pedidos',
+    component: PedidosPage
   },
   
   {

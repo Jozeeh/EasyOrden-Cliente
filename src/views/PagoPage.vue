@@ -9,14 +9,29 @@
                 <ion-buttons slot="end">
                     <ion-menu-button color="light"></ion-menu-button>
                 </ion-buttons>
-                <ion-title>Comidas</ion-title>
+                <ion-title>Pagos</ion-title>
             </ion-toolbar>
         </ion-header>
 
         <ion-content>
             <div class="contenedor">
 
+                <h1>CARRITO DE PEDIDO DE COMIDAS</h1>
+
                 <ion-grid>
+
+                    <ion-row class="head">
+                        <ion-col>
+                            Productos 
+                        </ion-col>
+                        <ion-col>
+                            Precio:
+                        </ion-col>
+                        <ion-col>
+                            Accion
+                        </ion-col>
+                    </ion-row>
+
                     <ion-row v-for="(prod, i) in this.$store.state.carrito">
                         <ion-col>
                             {{ prod.nombre }}
@@ -24,13 +39,24 @@
                         <ion-col>
                             {{ prod.precio }}
                         </ion-col>
+                        <ion-col>
+                            <ion-button color="danger" @click="eliminarProducto(i)">
+                                Quitar
+                            </ion-button>
+                        </ion-col>
                     </ion-row>
+                    
                     <ion-row>
                         <ion-col>
                             Total: 
                         </ion-col>
                         <ion-col>
                             {{ Total }}
+                        </ion-col>
+                        <ion-col>
+                            <ion-button color="success" v-if="Total != 0" router-link="/pedidos">
+                                Realizar pedido
+                            </ion-button>
                         </ion-col>
                     </ion-row>
                 </ion-grid>
@@ -69,6 +95,12 @@ export default {
             });
 
             this.Total = total
+        },
+        eliminarProducto(index){
+            
+            // Esta instrucción invocará una función definida en la propiedad actions
+            this.$store.dispatch('eliminarProdCarritoAction', index)
+            this.calcularTotal();
         }
     },
     created() {
@@ -77,6 +109,7 @@ export default {
     mounted() {
         this.calcularTotal();
     },
+    
     
     
 }
@@ -131,4 +164,17 @@ export default {
 #container a {
   text-decoration: none;
 } */
+
+/* Mis estilos */
+ion-grid{
+    border: 2px solid black;
+    border-radius: 20px;
+    
+}
+ion-col{
+    margin: 0 auto;
+}
+.head{
+    background-color: #e68055;
+}
 </style>

@@ -24,7 +24,7 @@
                                 <img alt="Silhouette of mountains" style="width: auto; height: auto;"
                                     :src="prod.img" />
                                 <ion-card-header>
-                                    <ion-card-subtitle>Bebidas</ion-card-subtitle>
+                                    <ion-card-subtitle>{{prod.categoria}}</ion-card-subtitle>
                                     <ion-card-title>{{ prod.nombre }}</ion-card-title>
                                 </ion-card-header>
 
@@ -74,8 +74,10 @@ export default {
             array.forEach(function (prod, i) {
                 if(i===index){
                     producto = {
+                        img: prod.img,
                         nombre: prod.nombre,
                         precio: prod.precio
+                        
                     }
                 }
             });

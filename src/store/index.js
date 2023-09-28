@@ -42,8 +42,12 @@ export default createStore({
     ],
 
     carrito:[
-      {nombre:'Coca Cola', precio: 0.75},
-      {nombre:'Coca Cola', precio: 0.75}
+      {img: 'https://www.coca-cola.com/content/dam/onexp/es/es/products/coca-cola-sabor-original/es_cc_original_750x750.jpg/width1960.jpg', nombre:'Coca Cola', precio: 0.75},
+      {img: 'https://www.coca-cola.com/content/dam/onexp/es/es/products/coca-cola-sabor-original/es_cc_original_750x750.jpg/width1960.jpg', nombre:'Coca Cola', precio: 0.75}
+    ],
+
+    pedidos:[
+
     ]
   },
   getters: {
@@ -51,7 +55,11 @@ export default createStore({
   mutations: {
     agregarCarrito(state, carrito){
       state.carrito.push(carrito)
-      },
+    },
+
+    eliminarProdCarrito(state, index){
+      state.carrito.splice(index, 1)
+    }
       
   },
   actions: {
@@ -59,6 +67,10 @@ export default createStore({
       // Esta instrucción permite invocar una mutación
       context.commit('agregarCarrito', carrito)
       },
+      eliminarProdCarritoAction(context, index){
+      // Esta instrucción invocará una función definida en la propiedad actions
+        context.commit('eliminarProdCarrito', index)
+      }
   },
   modules: {
   }
