@@ -1,21 +1,26 @@
 <template>
-  <div>
-    <video ref="video" autoplay></video>
+  <ion-page>
+    <video ref="video" autoplay class="escaner"></video>
     <canvas ref="canvas" style="display:none;"></canvas>
     <div v-if="scannedData">
       <p>Scanned Data:</p>
       <p>{{ scannedData }}</p>
     </div>
-    <button @click="startScan">Start Scan</button>
-    <button @click="stopScan">Stop Scan</button>
-  </div>
+    <ion-button @click="startScan">Start Scan</ion-button>
+    <ion-button @click="stopScan">Stop Scan</ion-button>
+  </ion-page>
 </template>
 
 <script>
 import jsQR from 'jsqr';
+import {IonPage, IonButton} from '@ionic/vue';
 
 export default {
-  name: 'QRScanner',
+  
+  name: 'BarcodeScanner',
+  components:{
+    IonPage, IonButton
+  },
   data() {
     return {
       scannedData: '',
@@ -67,3 +72,12 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  video{
+    border: 7px blue solid;
+    border-radius: 20px;
+    width: 300px;
+    margin: 0 auto;
+  }
+</style>
