@@ -1,4 +1,4 @@
 # EasyOrden-Cliente
 ## Instalar librerias:
 npm install <br>
-npm ...
+npm install jsqr
