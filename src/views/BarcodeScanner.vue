@@ -1,60 +1,69 @@
 <template>
-    <ion-page>
-      <h1>Escáner de Código QR</h1>
-      <div class="camera-preview">
-        <video ref="video" :style="{ width: '100%', height: '100%' }"></video>
-        <canvas ref="canvas" :width="videoWidth" :height="videoHeight" style="position: absolute; top: 0; left: 0;"></canvas>
-        <qrcode-stream @decode="onDecode" :mirror="false"></qrcode-stream>
-      </div>
-      <div v-if="qrCode">
-        <h2>Código QR Detectado:</h2>
-        <p>{{ qrCode }}</p>
-      </div>
-    </ion-page>
-  </template>
-  
-  <script>
-  import {IonPage} from '@ionic/vue'
-  import { ref } from 'vue';
-  import { QrcodeStream } from 'vue-qrcode-reader';
-  
-  export default {
-    name: 'BarcodeScanner',
-    components: {
-      QrcodeStream, IonPage
+  <div>
+    <video ref="video" autoplay></video>
+    <canvas ref="canvas" style="display:none;"></canvas>
+    <div v-if="scannedData">
+      <p>Scanned Data:</p>
+      <p>{{ scannedData }}</p>
+    </div>
+    <button @click="startScan">Start Scan</button>
+    <button @click="stopScan">Stop Scan</button>
+  </div>
+</template>
+
+<script>
+import jsQR from 'jsqr';
+
+export default {
+  name: 'QRScanner',
+  data() {
+    return {
+      scannedData: '',
+      videoStream: null,
+    };
+  },
+  methods: {
+    async startScan() {
+      const video = this.$refs.video;
+      const canvas = this.$refs.canvas;
+      try {
+        this.videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = this.videoStream;
+        await video.play();
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        const loop = async () => {
+          if (!this.videoStream) {
+            return;
+          }
+          ctx.drawImage(video, 0, 0, width, height);
+          const imageData = ctx.getImageData(0, 0, width, height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height);
+          if (code) {
+            this.scannedData = code.data;
+            this.stopScan();
+          }
+          requestAnimationFrame(loop);
+        };
+        loop();
+      } catch (err) {
+        console.error(err);
+      }
     },
-    data() {
-      return {
-        qrCode: null,
-        videoWidth: 640,
-        videoHeight: 480,
-      };
+    stopScan() {
+      if (this.videoStream) {
+        this.videoStream.getTracks().forEach((track) => {
+          track.stop();
+        });
+        this.videoStream = null;
+      }
     },
-    mounted() {
-      this.initCamera();
-    },
-    methods: {
-      async initCamera() {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-          const video = this.$refs.video;
-          video.srcObject = stream;
-        } catch (error) {
-          console.error('Error al acceder a la cámara:', error);
-        }
-      },
-      onDecode(result) {
-        this.qrCode = result;
-      },
-    },
-  };
-  </script>
-  
-  <style scoped>
-  .camera-preview {
-    position: relative;
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto;
-  }
-  </style>
+  },
+  beforeDestroy() {
+    this.stopScan();
+  },
+};
+</script>

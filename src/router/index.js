@@ -8,7 +8,7 @@ import BarcodeScanner from '../views/BarcodeScanner.vue'
 const routes = [
   {
     path: '',
-    redirect: '/inicio'
+    redirect: '/scaner'
   },
   {
     path: '/scaner',
