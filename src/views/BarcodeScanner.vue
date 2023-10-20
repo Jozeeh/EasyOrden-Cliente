@@ -10,11 +10,13 @@
       <div class="camera-container">
         <div class="scan-frame">
           <video ref="video" autoplay class="camera"></video>
+          <canvas ref="canvas" style="display: none;"></canvas>
         </div>
         <div class="scan-result" v-if="scannedData">
           <div class="scan-line" v-if="isScanning"></div>
           <p class="scan-label">Resultado del escaneo:</p>
           <p class="scan-data">{{ scannedData }}</p>
+
         </div>
         <p class="camera-error" v-if="cameraError">No has dado permisos a la cámara.</p>
       </div>
@@ -84,6 +86,7 @@ export default {
           const code = jsQR(imageData.data, imageData.width, imageData.height);
           if (code) {
             this.scannedData = code.data;
+            this.$store.state.qr = code.data;
             this.stopScan();
           }
           requestAnimationFrame(loop);

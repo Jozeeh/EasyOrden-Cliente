@@ -2,6 +2,13 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
+
+    qr: '',
+    stateInicio: false,
+    user:[
+
+    ],
+
     productos:[
       {
         categoria: 'bebidas',

@@ -4,11 +4,12 @@ import ComidasPage from '../views/categorias-views/ProductosPage.vue'
 import PagoPage from '../views/PagoPage.vue'
 import PedidosPage from '../views/PedidosPage.vue'
 import BarcodeScanner from '../views/BarcodeScanner.vue'
+import LoginView from '../views/LoginView/LoginView.vue'
 
 const routes = [
   {
     path: '',
-    redirect: '/scaner'
+    redirect: '/login'
   },
   {
     path: '/scaner',
@@ -29,6 +30,10 @@ const routes = [
   {
     path: '/pedidos',
     component: PedidosPage
+  },
+  {
+    path: '/login',
+    component: LoginView
   },
   
   {

@@ -25,6 +25,7 @@
     "cordova-plugin-qrscanner": "^3.0.1",
     "ionicons": "^7.0.0",
     "jsqr": "^1.4.0",
+    "qrjs": "^0.2.0",
     "quagga": "^0.12.1",
     "vue": "^3.3.4",
     "vue-qrcode-reader": "^5.3.6",
