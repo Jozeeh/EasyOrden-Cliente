@@ -1,15 +1,20 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import InicioPage from '../views/InicioPage.vue'
 import ComidasPage from '../views/categorias-views/ProductosPage.vue'
-import PagoPage from '../views/PagoPage.vue'
-import PedidosPage from '../views/PedidosPage.vue'
+import PagoPage from '../views/pagos-views/PagoPage.vue'
+import FacturaPage from '../views/pagos-views/FacturasPage.vue'
 import BarcodeScanner from '../views/BarcodeScanner.vue'
 import LoginView from '../views/LoginView/LoginView.vue'
+import RegistroPage from '../views/LoginView/RegistroPage.vue'
 
 const routes = [
   {
     path: '',
-    redirect: '/login'
+    redirect: '/scaner'
+  },
+  {
+    path: '/generador',
+    component: () => import ('../views/GeeradorQr.vue')
   },
   {
     path: '/scaner',
@@ -20,7 +25,11 @@ const routes = [
     component: InicioPage
   },
   {
-    path: '/productos/:categoria',
+    path: '/registrarse',
+    component: RegistroPage
+  },
+  {
+    path: '/productos',
     component: ComidasPage
   },
   {
@@ -28,8 +37,8 @@ const routes = [
     component: PagoPage
   },
   {
-    path: '/pedidos',
-    component: PedidosPage
+    path: '/facturas',
+    component: FacturaPage
   },
   {
     path: '/login',

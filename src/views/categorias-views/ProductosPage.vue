@@ -3,13 +3,13 @@
         <ion-header :translucent="true">
             <ion-toolbar class="bgcolor-header">
                 <ion-buttons slot="start">
-                    <ion-back-button text="Atrás" :icon="caretBack"></ion-back-button>
+                    <ion-back-button text="Atrás"></ion-back-button>
                 </ion-buttons>
 
                 <ion-buttons slot="end">
                     <ion-menu-button color="light"></ion-menu-button>
                 </ion-buttons>
-                <ion-title>{{this.$route.params.categoria}}</ion-title>
+                <ion-title>Productos</ion-title>
             </ion-toolbar>
         </ion-header>
 
@@ -18,75 +18,115 @@
 
                 <ion-grid>
                     <ion-row>
-                        <ion-col size="6" size-xm="6" v-for="(prod, i) in this.$store.state.productos" :key="i" >
+                        <ion-col>
+                            <!-- Selecionar comida -->
+                            <ion-list>
+                                <ion-item>
+                                    <ion-select aria-label="Favorite Fruit" value="apple" v-model="categoria" placeholder="Comidas">
+                                        <ion-select-option value="Comidas">Comidas</ion-select-option>
+                                        <ion-select-option value="Bebidas">Bebidas</ion-select-option>
+                                        <ion-select-option value="Postres">Postres</ion-select-option>
+                                        <ion-select-option value="Complementos">Complementos</ion-select-option>
+                                    </ion-select>
+                                </ion-item>
+                            </ion-list>
+                        </ion-col>
+                    </ion-row>
+
+                    <ion-row>
+                        <ion-col size-xm="6" v-for="(producto, i) in productos" :key="i">
                             <!-- TARJETAS PRODUCTOS -->
-                            <ion-card v-if="prod.categoria === this.$route.params.categoria">
-                                <img alt="Silhouette of mountains" style="width: auto; height: auto;"
-                                    :src="prod.img" />
+                            <ion-card v-if="producto.categoria == categoria">
+                                <img alt="producto-imagen"
+                                    :src="producto.imagen" />
                                 <ion-card-header>
-                                    <ion-card-subtitle>{{prod.categoria}}</ion-card-subtitle>
-                                    <ion-card-title>{{ prod.nombre }}</ion-card-title>
+                                    <ion-card-subtitle>{{ producto.categoria }} (ID: {{ producto.idPlato }})</ion-card-subtitle>
+                                    <ion-card-title>{{ producto.nombrePlato }}</ion-card-title>
+                                    <ion-card-title>$ {{ producto.precio }}</ion-card-title>
                                 </ion-card-header>
 
                                 <ion-card-content>
-                                    <b>Descripcion: </b> {{ prod.descripcion }}
-                                    <br>
-                                    Precio: <b>${{ prod.precio }} </b>
+                                    Here's a small text description for the card content. Nothing more, nothing less.
                                     <br>
                                     <!-- AGREGAR AL CARRITO -->
-                                    <ion-button color="success" class="btnAgregarCarrito" @click="agregarCarrito(i)">
+                                    <ion-button color="success" class="btnAgregarCarrito" @click="agregarCarrito(producto)">
                                         Agregar
                                         <ion-icon aria-hidden="true" slot="start" :ios="cart" :md="cart"></ion-icon>
                                     </ion-button>
                                 </ion-card-content>
                             </ion-card>
                         </ion-col>
-
                     </ion-row>
                 </ion-grid>
             </div>
 
         </ion-content>
+
+        <ion-footer class="footerPagar">
+            <ion-toolbar router-link="/pagar">
+                    <b>Productos:</b> {{ this.$store.getters.getCantidadCarrito }}  <b>Total:</b> ${{ this.$store.getters.getTotalCarrito }} <br>
+                    <ion-button size="default">
+                        <ion-icon aria-hidden="true" slot="start" :ios="cart" :md="cart"></ion-icon>
+                        Pagar
+                    </ion-button>
+            </ion-toolbar>
+        </ion-footer>
     </ion-page>
 </template>
 
 
 <script>
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton } from '@ionic/vue';
+import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonItem, IonFooter } from '@ionic/vue';
 
-import {cart} from 'ionicons/icons';
+import axios from 'axios';
+
+import { cart } from 'ionicons/icons';
 
 export default {
     name: 'InicioPage',
     components: {
-        IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton
+        IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonItem, IonFooter
     },
     data() {
         return {
             cart,
-            Cantidad: 0
+            ipLocal: this.$store.state.ipLocal,
+
+            categoria: 'Comidas',
+            productos: {}
         }
     },
-    methods:{
-        agregarCarrito(index){
-            var array = this.$store.state.productos
-            var producto 
-            array.forEach(function (prod, i) {
-                if(i===index){
-                    producto = {
-                        img: prod.img,
-                        nombre: prod.nombre,
-                        precio: prod.precio
-                        
-                    }
-                }
-            });
+    methods: {
+        // Agregar al carrito
+        agregarCarrito(producto) {
+            this.$store.dispatch('agregarCarritoAccion', producto)
+        },
 
-            this.$store.dispatch('agregarCarritoAction', producto)
-
+        // Obtenemos los plato según la categoria
+        obtenerPlatos() {
+            axios.get(`http://${this.ipLocal}/api/platos/select/${this.categoria}`)
+            .then(response => {
+                this.productos = response.data.data
+                console.log(response.data.data);
+            })
+            //Si ocurre un error se imprimirá en consola
+            .catch(error => {
+                console.error('OCURRIO UN ERROR: ', error);
+            })
         }
     },
-    
+    mounted() {
+        this.obtenerPlatos()
+    },
+    watch: {
+        //este metodo comprueba que la operacion sea diferente para volver hacer el calculo
+        //debe ser mismo nombre de la variable donde esta en return
+        categoria(nuevoValor, antiguoValor){
+            if(nuevoValor!=antiguoValor){
+                this.obtenerPlatos()
+            }
+        },
+    }
 }
 </script>
 
@@ -110,33 +150,22 @@ export default {
     font-size: 11px;
 }
 
-.sltCategorias{
+.sltCategorias {
     text-align: center;
     background: #E6E6E6;
 }
 
-/* #container {
-  text-align: center;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+.footerPagar {
+    background-color: #242424;
+    /* border-top: 5px solid #fc8e5b; */
+    padding: 10px;
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+ion-toolbar {
+    color: white;
+    --background: none;
+    background-color: #242424;
+    text-align: center;
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-  color: #8c8c8c;
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
-} */
 </style>

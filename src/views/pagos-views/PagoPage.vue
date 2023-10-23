@@ -3,7 +3,7 @@
         <ion-header :translucent="true">
             <ion-toolbar class="bgcolor-header">
                 <ion-buttons slot="start">
-                    <ion-back-button text="Atrás" :icon="caretBack"></ion-back-button>
+                    <ion-back-button text="Atrás"></ion-back-button>
                 </ion-buttons>
 
                 <ion-buttons slot="end">
@@ -32,13 +32,13 @@
                                 </ion-card-header>
                                 <ion-card-content>
                                     <ion-list>
-                                        <ion-item v-for="(prod, i) in this.$store.state.carrito">
+                                        <ion-item v-for="(producto, i) in this.$store.getters.getCarrito" :key="i">
                                             <ion-thumbnail slot="start">
-                                            <img alt="Silhouette of mountains" :src="prod.img" />
+                                            <img alt="producto-imagen" :src="producto.imagen" />
                                             </ion-thumbnail>
-                                            <ion-label>{{ prod.nombre }} <b>{{ prod.precio }}</b></ion-label>
+                                            <ion-label>{{ producto.nombrePlato }}</ion-label>
+                                            <ion-label>$ {{ producto.precio }}</ion-label>
                                         </ion-item>
-
                                     </ion-list>
                                 </ion-card-content>
                                 </ion-card>
@@ -50,7 +50,7 @@
                             <div class="cart-container">
                                 <div class="cart-content">
                                     <div class="cart-icon">&#128722;</div>
-                                    <div class="cart-total">TOTAL DE COMPRA: ${{Total}}</div>
+                                    <div class="cart-total">TOTAL DE COMPRA: $ {{ this.$store.getters.getTotalCarrito }}</div>
                                 </div>
                             </div>
                         </ion-col>
@@ -58,20 +58,24 @@
 
                     <ion-row>
                         <ion-col>
-                            <div class="payment-button">
+                            <button class="payment-button" @click="confirmarPago()">
                                 <img src="https://cdn-icons-png.flaticon.com/128/5776/5776691.png" alt="Stripe Logo">
-                                <a href="#">Pagar con efectivo</a>
-                            </div>
+                                Pagar con efectivo
+                            </button>
+                        </ion-col>
 
-                            <div class="payment-button">
+                        <ion-col>
+                            <button class="payment-button" @click="confirmarPago()">
                                 <img src="https://cdn-icons-png.flaticon.com/128/174/174861.png" alt="PayPal Logo">
-                                <a href="#">Pagar con PayPal</a>
-                            </div>
+                                Pagar con PayPal
+                            </button>
+                        </ion-col>
 
-                            <div class="payment-button">
+                        <ion-col>
+                            <button class="payment-button" @click="confirmarPago()">
                                 <img src="https://cdn-icons-png.flaticon.com/128/5949/5949784.png" alt="Tarjetas de Crédito Logo">
-                                <a href="#">Pagar con Tarjeta de Crédito o Debito</a>
-                            </div>
+                                Pagar con Tarjeta de Crédito o Debito
+                            </button>
                         </ion-col>
                     </ion-row>
                 </ion-grid>
@@ -95,27 +99,15 @@ export default {
     data() {
         return {
             cart,
-            Total: 0
+
+            carrito: this.$store.getters.getCarrito
         }
     },
-    methods:{
-        calcularTotal(){
-            var carrito = this.$store.state.carrito
-            var total = 0
-            carrito.forEach(function (prod, i){
-                total += prod.precio
-               
-            });
-
-            this.Total = total
-        },
-    },
-    created() {
-        this.calcularTotal();
-    },
-    mounted() {
-        this.calcularTotal();
-    },
+    methods: {
+        confirmarPago() {
+            this.$router.push('/facturas')
+        }
+    }
 }
 </script>
 

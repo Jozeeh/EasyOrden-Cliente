@@ -2,83 +2,69 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-
+    ipLocal: '',
+    numeroMesa: '',
     qr: '',
     stateInicio: false,
-    user:[
+    estadoSesion: false,
+    datosUsuario: [],
 
-    ],
+    //Array de la lista de comidas a pedir
+    carrito: []
 
-    productos:[
-      {
-        categoria: 'bebidas',
-        nombre: 'Coca Cola', 
-        descripcion:'una bebida azucarada gaseosa', 
-        img:'https://www.coca-cola.com/content/dam/onexp/es/es/products/coca-cola-sabor-original/es_cc_original_750x750.jpg/width1960.jpg', 
-        precio: 0.75
-      },
-      {
-        categoria: 'bebidas',
-        nombre: 'Pepsi',
-        descripcion: 'Refresco de cola con sabor y burbujas',
-        img: 'https://www.pepsi.com/en-us/refresh082123/images/cans/44341_Titan_Pep_Can_12oz_FR.png',
-        precio: 0.80
-      },
-      {
-        categoria: 'comidas',
-        nombre: 'Pizza Margarita',
-        descripcion: 'Pizza con salsa de tomate, mozzarella y albahaca',
-        img: 'https://www.saborusa.com/hn/wp-content/uploads/sites/12/2019/11/Animate-a-disfrutar-una-deliciosa-pizza-de-salchicha-Foto-destacada.png',
-        precio: 10.99
-      },
-      {
-        categoria: 'postres',
-        nombre: 'Pastel de Chocolate',
-        descripcion: 'Pastel de chocolate decadente con glaseado',
-        img: 'https://images.aws.nestle.recipes/original/2020_06_09T08_18_01_mrs_ImageRecipes_1810lrg.jpg',
-        precio: 5.99
-      },
-      {
-        categoria: 'otros',
-        nombre: 'Pan con ajo',
-        descripcion: 'Disfruta tu entradita con el delicioso pan co ajo',
-        img: 'https://i.blogs.es/8e3bfe/pan_ajo/840_560.jpg',
-        precio: 9.99
-      }
-
-    ],
-
-    carrito:[
-      {img: 'https://www.coca-cola.com/content/dam/onexp/es/es/products/coca-cola-sabor-original/es_cc_original_750x750.jpg/width1960.jpg', nombre:'Coca Cola', precio: 0.75},
-      {img: 'https://www.coca-cola.com/content/dam/onexp/es/es/products/coca-cola-sabor-original/es_cc_original_750x750.jpg/width1960.jpg', nombre:'Coca Cola', precio: 0.75}
-    ],
-
-    pedidos:[
-
-    ]
   },
   getters: {
+    getCarrito(state) {
+      return state.carrito
+    },
+    getTotalCarrito(state) {
+      const total = state.carrito.reduce((acumular, producto) => {
+        return acumular + parseFloat(producto.precio);
+      }, 0);
+
+      return total.toFixed(2);
+    }, 
+    // Este es para mostrar la cantidad de productos que se han añadido al carrito
+    getCantidadCarrito(state) {
+      const cantidad = state.carrito.length
+      return cantidad
+    }
+
   },
   mutations: {
-    agregarCarrito(state, carrito){
-      state.carrito.push(carrito)
+    agregarCarrito(state, nuevoProducto) {
+      console.log(nuevoProducto)
+      state.carrito.push(nuevoProducto)
     },
-
-    eliminarProdCarrito(state, index){
-      state.carrito.splice(index, 1)
+    eliminarCarrito(state){
+      state.carrito = []
+    },
+    iniciarSesion(state){
+      state.estadoSesion = true
+      state.carrito = []
+    },
+    cerrarSesion(state){
+      state.estadoSesion = false
+      state.datosUsuario = []
+      state.carrito = []
     }
-      
+        
   },
   actions: {
-    agregarCarritoAction(context, carrito){
-      // Esta instrucción permite invocar una mutación
-      context.commit('agregarCarrito', carrito)
-      },
-      eliminarProdCarritoAction(context, index){
-      // Esta instrucción invocará una función definida en la propiedad actions
-        context.commit('eliminarProdCarrito', index)
-      }
-  },
-  modules: {
+    agregarCarritoAccion(context, nuevoProducto){
+      context.commit('agregarCarrito', nuevoProducto)
+    },
+
+    eliminarCarritoAccion(context){
+      context.commit('eliminarCarrito')
+    },
+
+    iniciarSesionAccion(context){
+      context.commit('iniciarSesion')
+    },
+    cerrarSesionAccion(context){
+      context.commit('cerrarSesion')
+    }
+
   }
 })

@@ -87,6 +87,27 @@ export default {
           if (code) {
             this.scannedData = code.data;
             this.$store.state.qr = code.data;
+
+            // obtiene los datos
+            const lineaDeTexto = code.data;
+
+            // Dividir la cadena en un arreglo usando la coma como separador
+            const datos = lineaDeTexto.split(',');
+
+            // Verificar si se obtuvieron dos elementos después de dividir
+            if (datos.length === 2) {
+              // Asignar los valores a las variables
+              const dato1 = datos[0].trim(); // Trim para eliminar espacios en blanco
+              const dato2 = datos[1].trim();
+
+              this.$store.state.ipLocal = dato1
+              this.$store.state.numeroMesa = dato2
+              this.$router.push('/login')
+            } else {
+              console.log("La línea de texto no contiene dos elementos separados por comas.");
+            }
+
+
             this.stopScan();
           }
           requestAnimationFrame(loop);

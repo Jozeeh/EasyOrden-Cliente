@@ -4,8 +4,7 @@
       <ion-menu side="end" content-id="main-content" type="overlay" v-if="(this.$store.state.stateInicio != false)">
         <ion-content>
           <ion-list id="inbox-list">
-            <ion-list-header>{{this.$store.state.user.name}}</ion-list-header>
-            <ion-note>{{this.$store.state.user.email}}</ion-note>
+            
 
             <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
               <ion-item @click="selectedIndex = i" router-direction="root" :router-link="p.url" lines="none" :detail="false" class="hydrated" :class="{ selected: selectedIndex === i }">
