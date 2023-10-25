@@ -13,12 +13,13 @@
 
                             <ion-card-content>
                                 <ion-item>
-                                    <ion-input label-placement="floating" label="Nombre y Apellido" v-model="userData.name" type="text"
-                                        required></ion-input>
+                                    <ion-input label-placement="floating" label="Nombre y Apellido" v-model="userData.name"
+                                        type="text" required></ion-input>
                                 </ion-item>
                                 <ion-item>
-                                    <ion-input label-placement="floating" label="DUI (solo números sin guión)" v-model="userData.dui" type="number"
-                                        required @input="limitarCaracteresDUI"></ion-input>
+                                    <ion-input label-placement="floating" label="DUI (solo números sin guión)"
+                                        v-model="userData.dui" type="number" required
+                                        @input="limitarCaracteresDUI"></ion-input>
                                 </ion-item>
                                 <ion-item>
                                     <ion-input label-placement="floating" label="Teléfono" v-model="userData.telefono"
@@ -34,7 +35,8 @@
                                 </ion-item>
 
                                 <br>
-                                <a style="text-decoration: none;" @click="this.$router.go(-1)">¿Ya tienes cuenta? Inicia Sesión</a>
+                                <a style="text-decoration: none;" @click="this.$router.go(-1)">¿Ya tienes cuenta? Inicia
+                                    Sesión</a>
                             </ion-card-content>
                         </ion-card>
                     </ion-col>
@@ -54,16 +56,11 @@
                 </ion-row>
             </ion-grid>
 
-            <ion-alert
-                :is-open="alertaRegistro"
-                :header="datosAlertaRegistro.header"
-                :message="datosAlertaRegistro.message"
-                :buttons="datosAlertaRegistro.buttons"
-                @didDismiss="verAlertaRegistro(false)"
-            ></ion-alert>
+            <ion-alert :is-open="alertaRegistro" :header="datosAlertaRegistro.header" :message="datosAlertaRegistro.message"
+                :buttons="datosAlertaRegistro.buttons" @didDismiss="verAlertaRegistro(false)"></ion-alert>
         </ion-content>
 
-        <ion-footer> 
+        <ion-footer>
             <ion-toolbar>
                 Desarrollado por DevDreams - 2023
             </ion-toolbar>
@@ -73,7 +70,8 @@
   
 <script>
 import { IonButton, IonCard, IonContent, IonHeader, IonInput, IonItem, IonList, IonMenuButton, IonPage, IonTitle, IonToolbar, IonButtons, IonGrid, IonRow, IonCol, IonCardHeader, IonCardTitle, IonCardContent, IonBackButton, IonFooter, IonModal, IonLabel, IonIcon, IonAlert } from '@ionic/vue';
-import axios from 'axios'
+import axios from 'axios';
+
 
 export default {
     name: "RegistroPage",
@@ -102,7 +100,7 @@ export default {
     },
     methods: {
         verAlertaRegistro(state, mensajeEstado) {
-            if (mensajeEstado === "Registro exitoso!"){
+            if (mensajeEstado === "Registro exitoso!") {
                 this.datosAlertaRegistro.header = "Registro Exitoso!";
                 this.datosAlertaRegistro.message = "Ya puedes iniciar sesión";
                 this.datosAlertaRegistro.buttons = [{
@@ -113,7 +111,7 @@ export default {
                     },
                 }];
                 this.alertaRegistro = state;
-            } else{
+            } else {
                 this.datosAlertaRegistro.header = "Registro Fallido!";
                 this.datosAlertaRegistro.message = "Ingresa los datos correctamente!";
                 this.datosAlertaRegistro.buttons = [{
@@ -127,6 +125,9 @@ export default {
             }
         },
         registrarUsuario() {
+
+            
+
             // Aquí puedes agregar la lógica para registrar al usuario, por ejemplo, enviar los datos a tu servidor.
             // Puedes acceder a los datos del usuario a través de this.userData.
             axios.post(`http://${this.ipLocal}/api/registro/store`, this.userData)
@@ -141,11 +142,11 @@ export default {
                 })
         },
         limitarCaracteresDUI() {
-        // Limitar la longitud del valor del campo a 10 caracteres
-        if (this.userData.dui.length > 9) {
-            this.userData.dui = this.userData.dui.slice(0, 9);
-        }
-    },
+            // Limitar la longitud del valor del campo a 10 caracteres
+            if (this.userData.dui.length > 9) {
+                this.userData.dui = this.userData.dui.slice(0, 9);
+            }
+        },
     }
 };
 </script>
@@ -158,41 +159,47 @@ export default {
 }
 
 /* Estilos personalizados para darle un aspecto más moderno */
-.fondo-card-sesion{
+.fondo-card-sesion {
     background-color: #ffffff;
     border-radius: 10px;
     text-align: center;
     padding-bottom: 10px;
 }
+
 ion-item {
     --ion-item-background: none;
     color: black;
 }
+
 ion-card-title {
     color: black;
 }
+
 ion-button {
     margin: 0 auto;
     width: 90%;
 }
-.fondo-sesion {
-  --background: none;
-  background-image: url('/FondoSesion.webp');
 
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: cover;
+.fondo-sesion {
+    --background: none;
+    background-image: url('/FondoSesion.webp');
+
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
+
 .fondo-sesion::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(14, 14, 14, 0.5);
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(14, 14, 14, 0.5);
 }
-ion-footer{
+
+ion-footer {
     --ion-background-color: none;
     background-color: rgb(26, 26, 26);
     --ion-text-color: none;

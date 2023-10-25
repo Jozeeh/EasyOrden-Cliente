@@ -9,77 +9,89 @@
                 <ion-buttons slot="end">
                     <ion-menu-button color="light"></ion-menu-button>
                 </ion-buttons>
-                <ion-title>Método de pago</ion-title>
+                <ion-title class="ion-text-center">Método de pago</ion-title>
             </ion-toolbar>
         </ion-header>
 
-        <ion-content>
-            <div class="contenedor">
+        <ion-content class="fondo">
+            <ion-grid>
+                <ion-row>
+                    <ion-col>
+                        <ion-card class="card-seguirCompra ion-text-center" @click="this.$router.push('/inicio')">
+                            <ion-card-content>
+                                <ion-title>¿Quieres seguir comprando?</ion-title>
+                                <ion-title><ion-icon :icon="cart"></ion-icon>Añade más productos aquí.</ion-title>
+                            </ion-card-content>
+                        </ion-card>
+                    </ion-col>
+                </ion-row>
 
-                <ion-grid>
-                    <ion-row class="ion-text-center">
-                        <ion-col>
-                           <h2>Carrito de compras</h2> 
-                        </ion-col>
-                    </ion-row>
+                <ion-row>
+                    <ion-col>
+                        <ion-card class="card-listaCompras">
+                            <ion-card-header class="ion-text-center">
+                                <ion-card-title style="--color: black;">
+                                    Carrito de compras
+                                </ion-card-title>
+                                <ion-card-subtitle>platillos a comprar:</ion-card-subtitle>
+                            </ion-card-header>
+                            <ion-card-content>
+                                <ion-item v-for="(producto, i) in this.$store.getters.getCarrito" :key="i" style="--ion-item-background: white; color: black;">
+                                    <ion-thumbnail slot="start">
+                                        <img alt="producto-imagen" :src="producto.imagen" />
+                                    </ion-thumbnail>
+                                    <ion-label>{{ producto.nombrePlato }}</ion-label>
+                                    <ion-label>${{ producto.precio }}</ion-label>
+                                </ion-item>
+                            </ion-card-content>
+                        </ion-card>
+                    </ion-col>
+                </ion-row>
 
-                    <ion-row>
-                        <ion-col>
-                            <ion-card>
-                                <ion-card-header>
-                                    <ion-card-title>Platos seleccionados</ion-card-title>
-                                    <ion-card-subtitle>platillos a comprar:</ion-card-subtitle>
-                                </ion-card-header>
-                                <ion-card-content>
-                                    <ion-list>
-                                        <ion-item v-for="(producto, i) in this.$store.getters.getCarrito" :key="i">
-                                            <ion-thumbnail slot="start">
-                                            <img alt="producto-imagen" :src="producto.imagen" />
-                                            </ion-thumbnail>
-                                            <ion-label>{{ producto.nombrePlato }}</ion-label>
-                                            <ion-label>$ {{ producto.precio }}</ion-label>
-                                        </ion-item>
-                                    </ion-list>
-                                </ion-card-content>
-                                </ion-card>
-                        </ion-col>
-                    </ion-row>
+                <ion-row>
+                    <ion-col>
+                        <ion-card>
+                            <ion-card-content class="ion-text-center" style="color: black; background-color: white;">
+                                <b>TOTAL DE COMPRA:</b> ${{ this.$store.getters.getTotalCarrito }}
+                            </ion-card-content>
+                        </ion-card>
+                    </ion-col>
+                </ion-row>
 
-                    <ion-row>
-                        <ion-col>
-                            <div class="cart-container">
-                                <div class="cart-content">
-                                    <div class="cart-icon">&#128722;</div>
-                                    <div class="cart-total">TOTAL DE COMPRA: $ {{ this.$store.getters.getTotalCarrito }}</div>
-                                </div>
-                            </div>
-                        </ion-col>
-                    </ion-row>
+                <!-- BOTONES METODO DE PAGO -->
+                <ion-row>
+                    <ion-col>
+                        <button class="payment-button" @click="mandarCocina()">
+                            <img src="https://cdn-icons-png.flaticon.com/128/5776/5776691.png" alt="Stripe Logo">
+                            Pagar con efectivo
+                        </button>
+                    </ion-col>
 
-                    <ion-row>
-                        <ion-col>
-                            <button class="payment-button" @click="confirmarPago()">
-                                <img src="https://cdn-icons-png.flaticon.com/128/5776/5776691.png" alt="Stripe Logo">
-                                Pagar con efectivo
-                            </button>
-                        </ion-col>
+                    <ion-col>
+                        <button class="payment-button" @click="mandarCocina()">
+                            <img src="https://cdn-icons-png.flaticon.com/128/174/174861.png" alt="PayPal Logo">
+                            Pagar con PayPal
+                        </button>
+                    </ion-col>
 
-                        <ion-col>
-                            <button class="payment-button" @click="confirmarPago()">
-                                <img src="https://cdn-icons-png.flaticon.com/128/174/174861.png" alt="PayPal Logo">
-                                Pagar con PayPal
-                            </button>
-                        </ion-col>
+                    <ion-col>
+                        <button class="payment-button" @click="mandarCocina()">
+                            <img src="https://cdn-icons-png.flaticon.com/128/5949/5949784.png"
+                                alt="Tarjetas de Crédito Logo">
+                            Pagar con Tarjeta de Crédito o Debito
+                        </button>
+                    </ion-col>
+                </ion-row>
+            </ion-grid>
 
-                        <ion-col>
-                            <button class="payment-button" @click="confirmarPago()">
-                                <img src="https://cdn-icons-png.flaticon.com/128/5949/5949784.png" alt="Tarjetas de Crédito Logo">
-                                Pagar con Tarjeta de Crédito o Debito
-                            </button>
-                        </ion-col>
-                    </ion-row>
-                </ion-grid>
-            </div>
+            <!-- ALERTA EN CASO NO HAYA PRODUCTOS EN EL CARRITO -->
+            <ion-alert
+                :is-open="alertaCarrito"
+                :header="datosAlertaCarrito.header"
+                :message="datosAlertaCarrito.message"
+                :buttons="datosAlertaCarrito.buttons"
+                @didDismiss="verAlertaCarrito(false)"
+            ></ion-alert>
 
         </ion-content>
     </ion-page>
@@ -87,53 +99,130 @@
 
 
 <script>
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonLabel, IonItem, IonThumbnail } from '@ionic/vue';
-
-import {cart} from 'ionicons/icons';
+import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonLabel, IonItem, IonThumbnail, IonAlert } from '@ionic/vue';
+import axios from 'axios';
+import { cart } from 'ionicons/icons';
 
 export default {
     name: 'InicioPage',
     components: {
-        IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonLabel, IonItem, IonThumbnail
+        IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonLabel, IonItem, IonThumbnail, IonAlert
     },
     data() {
         return {
             cart,
 
-            carrito: this.$store.getters.getCarrito
+            // carrito: this.$store.getters.getCarrito
+
+            ipLocal: this.$store.state.ipLocal,
+            carrito: {},
+            pedido: {},
+            idUser: this.$store.state.datosUsuario.id,
+
+            alertaCarrito: false,
+            datosAlertaCarrito: {
+                header: '',
+                message: '',
+                buttons: []
+            },
         }
     },
     methods: {
+        verAlertaCarrito(state, mensajeEstado) {
+            if (mensajeEstado === "Compra exitosa!"){
+                this.datosAlertaCarrito.header = "Compra Exitosa!";
+                this.datosAlertaCarrito.message = "Muchas gracias por tu compra!";
+                this.datosAlertaCarrito.buttons = [{
+                    text: 'OK',
+                    role: 'confirm',
+                    handler: () => {
+                        this.$router.push('/facturas')
+                    },
+                }];
+                this.alertaCarrito = state;
+            } else{
+                this.datosAlertaCarrito.header = "Compra Fallida!";
+                this.datosAlertaCarrito.message = "Al parecer no tienes productos para comprar!";
+                this.datosAlertaCarrito.buttons = [{
+                    text: 'OK',
+                    role: 'confirm',
+                    handler: () => {
+                        console.log('No había productos para comprar!')
+                    },
+                }];
+                this.alertaCarrito = state;
+            }
+        },
+
+        mandarCocina() {
+            this.pedido = {
+                detalles: this.$store.getters.getCarrito.map(producto => ({
+                    fkIdPlato: producto.idPlato,
+                    fkIdUser: producto.idUsuario,
+                    estadoPedido: 'Ordenado',
+                    numMesa: 'Mesa 1'
+                }))
+            };
+
+            axios.post(`http://${this.ipLocal}/api/pedidos/store`, this.pedido)
+                .then(response => {
+                    this.verAlertaCarrito(true, "Compra exitosa!");
+                    this.$router.push('/facturas')
+                    console.log(response.data)
+                })
+                .catch(error => {
+                    this.verAlertaCarrito(true, "Compra fallida!");
+                    this.$router.push('/inicio');
+                    console.error('OCURRIO UN ERROR: ', error);
+                })
+        },
         confirmarPago() {
             this.$router.push('/facturas')
         }
-    }
+    },
+    
 }
 </script>
 
 
 <style scoped>
+.card-listaCompras {
+    --background: white;
+    --color: black;
+}
+
+.card-seguirCompra {
+    --background: #FEFBD6;
+    background-position: center center;
+    background-size: cover;
+    font-weight: bold;
+    border-radius: 10px;
+    color: black;
+}
+
+.fondo {
+    --background: none;
+    background-image: url('/FondoSesion.webp');
+
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.fondo::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(14, 14, 14, 0.5);
+}
+
 /* ESTILOS HEADER */
 .bgcolor-header {
     --background: #c93e4f;
     --color: white;
-}
-
-.contenedor {
-    /* border: 1px solid black; */
-    width: 90%;
-    margin: 0 auto;
-}
-
-.btnAgregarCarrito {
-    margin-top: 20px;
-    font-weight: bold;
-    font-size: 11px;
-}
-
-.sltCategorias{
-    text-align: center;
-    background: #E6E6E6;
 }
 
 /* TOTAL COMPRA */
@@ -142,7 +231,8 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%; /* Centra verticalmente en la ventana */
+    height: 100%;
+    /* Centra verticalmente en la ventana */
     padding: 10px;
     border-top: 5px solid #fc8e5b;
 }
@@ -178,7 +268,8 @@ export default {
 }
 
 .payment-button img {
-    max-width: 40px; /* Tamaño del logotipo ajustado */
+    max-width: 40px;
+    /* Tamaño del logotipo ajustado */
     height: auto;
     vertical-align: middle;
     margin-right: 10px;
@@ -216,5 +307,4 @@ export default {
 
 #container a {
   text-decoration: none;
-} */
-</style>
+} */</style>

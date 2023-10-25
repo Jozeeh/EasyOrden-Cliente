@@ -28,7 +28,7 @@ import {
 } from '@ionic/vue';
 import { ref } from 'vue';
 import {
-  home, archiveOutline, archiveSharp, bookmarkOutline, bookmarkSharp, heartOutline, heartSharp, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp,
+  home, archiveOutline, archiveSharp, fastFoodOutline, fastFoodSharp, bookmarkOutline, bookmarkSharp, heartOutline, heartSharp, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp,
 } from 'ionicons/icons';
 
 const selectedIndex = ref(0);
@@ -40,25 +40,13 @@ const appPages = [
     mdIcon: home,
   },
   {
-    title: 'Iniciar sesión',
-    url: '/folder/Inbox',
-    iosIcon: mailOutline,
-    mdIcon: mailSharp,
+    title: 'Preparacion',
+    url: '/preparacion',
+    iosIcon: fastFoodOutline,
+    mdIcon: fastFoodSharp,
   },
   {
-    title: 'Registrarse',
-    url: '/folder/Outbox',
-    iosIcon: paperPlaneOutline,
-    mdIcon: paperPlaneSharp,
-  },
-  {
-    title: 'Ajustes',
-    url: '/folder/Favorites',
-    iosIcon: heartOutline,
-    mdIcon: heartSharp,
-  },
-  {
-    title: 'Acerca de',
+    title: 'Cerrar Sesion',
     url: '/folder/Archived',
     iosIcon: archiveOutline,
     mdIcon: archiveSharp,

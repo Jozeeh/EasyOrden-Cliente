@@ -55,12 +55,20 @@
                             <ion-card-content>
                                 Si necesitas la ayuda de un mesero haz click aquí!
                                 <br>
-                                <ion-button color="tertiary">Pedir mesero</ion-button>
+                                <ion-button color="tertiary" :disabled="pedirMesero"
+                                    @click="mostrarAlertaMesero(true)">Pedir
+                                    mesero</ion-button>
                             </ion-card-content>
                         </ion-card>
                     </ion-col>
                 </ion-row>
             </ion-grid>
+
+            <!-- ALERTA de pedir un mesero -->
+            <ion-toast :is-open="isOpen"
+                message="¡Se ha Notificado a un mesero! (Luego de 5 minutos se volvera activar el boton)" :duration="5000"
+                @didDismiss="setOpen(false)"></ion-toast>
+
         </ion-content>
 
         <ion-footer class="footerPagar">
@@ -78,19 +86,81 @@
 
 
 <script>
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonFooter, IonItem, IonThumbnail, IonNote } from '@ionic/vue';
+import {
+    IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard,
+    IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonFooter,
+    IonItem, IonAlert,
+    IonThumbnail, IonNote, IonToast
+} from '@ionic/vue';
 
 import { cart } from 'ionicons/icons';
+
+import axios from 'axios';
 
 export default {
     name: 'InicioPage',
     components: {
-        IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonFooter, IonItem, IonThumbnail, IonNote
+        IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard,
+        IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonFooter,
+        IonItem, IonThumbnail, IonNote, IonAlert, IonToast
     },
     data() {
         return {
-            cart
+            cart,
+            pedirMesero: false,
+            isOpen: false,
+            ipLocal: this.$store.state.ipLocal
         }
+    },
+    methods: {
+        alertaMesero() {
+            this.pedirMesero = true;
+            setTimeout(() => {
+                this.pedirMesero = false;
+            }, 300000); // 300000 ms = 5 minutos
+        },
+        mostrarAlertaMesero(state) {
+            const alerta = {
+                fkIdUsuario: this.$store.state.datosUsuario.id,
+                mesa: this.$store.state.numeroMesa,
+                estado: 'enviado'
+            }
+            // console.log(alerta)
+            const datosJSON = JSON.stringify(alerta);
+            // console.log(datosJSON)
+            axios.post(`http://${this.ipLocal}/api/pedirmesero`, alerta)
+                .then(response => {
+                    if (response.data.code === 200) {
+                        this.isOpen = state
+                        this.alertaMesero()
+                    }
+                })
+                .catch(error => console.log(error))
+
+        },
+        getPedirMesero(){
+            axios.get(`http://${this.ipLocal}/api/mostrarMesero`)
+            .then(response =>{
+                const array = response.data.data
+                // if(response.data.data.estado === 'enviado' && response.data.data.fkIdUsuario === this.$store.state.datosUsuario.id){
+                    array.forEach(function (el, i) {
+                        if(el.estado === 'enviado'){
+                            console.log('funciona')
+                        }
+                    });
+                // }
+                
+            })
+            .catch(error => console.log(error))
+        }
+    },
+    created() {
+        // Configura una consulta periódica cada ciertos segundos (por ejemplo, cada 5 segundos)
+        this.pollingTimer = setInterval(this.getPedirMesero, 5000);
+    },
+    beforeDestroy() {
+        // Limpia el temporizador cuando el componente se destruye para evitar fugas de memoria
+        clearInterval(this.pollingTimer);
     },
     mounted() {
         console.log(this.$store.state.estadoSesion)
@@ -161,4 +231,5 @@ ion-toolbar {
     --background: none;
     background-color: #242424;
     text-align: center;
-}</style>
+}
+</style>

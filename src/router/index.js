@@ -6,6 +6,8 @@ import FacturaPage from '../views/pagos-views/FacturasPage.vue'
 import BarcodeScanner from '../views/BarcodeScanner.vue'
 import LoginView from '../views/LoginView/LoginView.vue'
 import RegistroPage from '../views/LoginView/RegistroPage.vue'
+import PreparacionPage from '../views/prepracion/PreparacionPage.vue'
+
 
 const routes = [
   {
@@ -43,6 +45,10 @@ const routes = [
   {
     path: '/login',
     component: LoginView
+  },
+  {
+    path: '/preparacion',
+    component: PreparacionPage
   },
   
   {
