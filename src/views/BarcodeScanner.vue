@@ -1,15 +1,54 @@
 <template>
   <ion-page class="barcode-scanner-page">
-    <ion-content class="fondo">
+    <ion-content>
       <ion-header>
         <ion-toolbar color="danger">
-          <ion-title>Barcode Scanner</ion-title>
+          <ion-title><img src="/EasyOrden-LogoBlancoSinFondo.png" alt=""></ion-title>
         </ion-toolbar>
       </ion-header>
 
-      <ion-content class="ion-padding">
+      <ion-content class="ion-padding fondo">
+
+        <ion-card class="card-qr">
+          <ion-card-content>
+
+            <div >
+              <video ref="video" autoplay class="camera"></video>
+              <canvas ref="canvas" style="display: none;"></canvas>
+            </div>
+            <!-- <div class="scan-result" v-if="scannedData">
+              <div class="scan-line" v-if="isScanning"></div> -->
+              <p class="camera-error" v-if="cameraError">No has dado permisos a la cámara.</p>
+              <!-- <p class="scan-label">Resultado del escaneo:</p> -->
+              <!-- <p class="scan-data">{{ scannedData }}</p> -->
+            <!-- </div> -->
+
+            <!-- botones -->
+            <ion-grid>
+          <ion-row class="ion-align-items-center">
+            <ion-col>
+              <ion-button class="toggle-camera" @click="toggleCamera" v-if="isMobile" color="warning">
+                <ion-icon :icon="isFrontCamera ? 'camera-reverse' : 'camera'"></ion-icon>
+                Cambiar Cámara
+              </ion-button>
+            </ion-col>
+            <ion-col>
+              <ion-button class="start-scan" @click="startScan" v-if="!isScanning" color="warning">Iniciar
+                Escaneo</ion-button>
+            </ion-col>
+            <ion-col>
+              <ion-button class="stop-scan" @click="stopScan" v-if="!isScanning" color="warning">Detener
+                Escaneo</ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+            <ion-button @click="descargarPDF" v-if="qrCodeUrl">Descargar PDF</ion-button>
+          </ion-card-content>
+        </ion-card>
+
         <div class="camera-container">
-          <div class="scan-frame">
+          <!-- <div class="scan-frame">
             <video ref="video" autoplay class="camera"></video>
             <canvas ref="canvas" style="display: none;"></canvas>
           </div>
@@ -18,26 +57,11 @@
             <p class="scan-label">Resultado del escaneo:</p>
             <p class="scan-data">{{ scannedData }}</p>
 
-          </div>
-          <p class="camera-error" v-if="cameraError">No has dado permisos a la cámara.</p>
+          </div> -->
+         
         </div>
 
-        <ion-grid>
-          <ion-row class="ion-align-items-center">
-            <ion-col>
-              <ion-button class="toggle-camera" @click="toggleCamera" v-if="isMobile">
-                <ion-icon :icon="isFrontCamera ? 'camera-reverse' : 'camera'"></ion-icon>
-                Cambiar Cámara
-              </ion-button>
-            </ion-col>
-            <ion-col>
-              <ion-button class="start-scan" @click="startScan" v-if="!isScanning">Iniciar Escaneo</ion-button>
-            </ion-col>
-            <ion-col>
-              <ion-button class="stop-scan" @click="stopScan" v-if="!isScanning">Detener Escaneo</ion-button>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
+        
       </ion-content>
     </ion-content>
   </ion-page>
@@ -45,12 +69,12 @@
 
 <script>
 import jsQR from 'jsqr';
-import { IonPage, IonContent, IonButton, IonIcon, IonGrid, IonRow, IonCol, IonHeader, IonToolbar, IonTitle } from '@ionic/vue'; // Asegúrate de importar IonIcon
+import { IonPage, IonContent, IonButton, IonIcon, IonGrid, IonRow, IonCol, IonHeader, IonToolbar, IonTitle, IonCard, IonCardContent, IonImg } from '@ionic/vue'; // Asegúrate de importar IonIcon
 
 export default {
   name: 'BarcodeScanner',
   components: {
-    IonPage, IonContent, IonButton, IonIcon, IonGrid, IonRow, IonCol, IonHeader, IonToolbar, IonTitle
+    IonPage, IonContent, IonButton, IonIcon, IonGrid, IonRow, IonCol, IonHeader, IonToolbar, IonTitle, IonCard, IonCardContent, IonImg
   },
   data() {
     return {
@@ -149,6 +173,13 @@ export default {
 </script>
 
 <style scoped>
+.card-qr {
+  background-color: #ffffff;
+  border-radius: 10px;
+  text-align: center;
+  padding-bottom: 10px;
+}
+
 .fondo {
   --background: none;
   background-image: url('/FondoSesion.webp');
@@ -156,6 +187,16 @@ export default {
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+.fondo::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(14, 14, 14, 0.5);
 }
 
 .barcode-scanner-page {
@@ -186,6 +227,7 @@ export default {
 .camera {
   width: 100%;
   max-width: 400px;
+  border-radius: 30px;
 }
 
 .scan-result {
