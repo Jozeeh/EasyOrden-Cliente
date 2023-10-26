@@ -69,6 +69,48 @@
                 message="¡Se ha Notificado a un mesero! (Luego de 5 minutos se volvera activar el boton)" :duration="5000"
                 @didDismiss="setOpen(false)"></ion-toast>
 
+
+            <!-- Modal de alerta de que el mesero ya va en camino -->
+            <ion-modal :is-open="meseroCamino">
+                <ion-header>
+                    <ion-toolbar>
+                        <ion-title>Alerta</ion-title>
+                        <ion-buttons slot="end">
+                            <ion-button @click="finalizarAlerta()">Close</ion-button>
+                        </ion-buttons>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content class="ion-padding fondo">
+
+                    <p style="color: white;">
+                    <h1 style="color: yellow; font-family: Arial">¡El mesero ya va en camino!</h1> <br>
+                    ¡Luego de 5 minutos se activar de nuevo el modal para que puedas confirmar si el mesero llego!
+                    </p>
+                    <img src="/camarero.png" alt="">
+                </ion-content>
+
+            </ion-modal>
+
+            <!-- Modal de alerta de que el mesero ya va en camino -->
+            <ion-modal :is-open="esperaMesero">
+                <ion-header>
+                    <ion-toolbar>
+                        <ion-title>Alerta</ion-title>
+
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content class="ion-padding fondo">
+                    
+                        <h1 style="color: white;">¿Ha llegado el mesero?</h1>
+                    
+
+                    <ion-button @click="terminar()" color="success">Finalizar</ion-button>
+                    <ion-button @click="meseroNoLlego()" color="warning">Mandar Nueva alerta</ion-button>
+
+
+                </ion-content>
+            </ion-modal>
+
         </ion-content>
 
         <ion-footer class="footerPagar">
@@ -90,7 +132,7 @@ import {
     IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard,
     IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonFooter,
     IonItem, IonAlert,
-    IonThumbnail, IonNote, IonToast
+    IonThumbnail, IonNote, IonToast, IonModal
 } from '@ionic/vue';
 
 import { cart } from 'ionicons/icons';
@@ -102,17 +144,48 @@ export default {
     components: {
         IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard,
         IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonFooter,
-        IonItem, IonThumbnail, IonNote, IonAlert, IonToast
+        IonItem, IonThumbnail, IonNote, IonAlert, IonToast, IonModal
     },
     data() {
         return {
             cart,
             pedirMesero: false,
             isOpen: false,
-            ipLocal: this.$store.state.ipLocal
+            ipLocal: this.$store.state.ipLocal,
+            fechaActual: '',
+            // activa modal de mesero en camino
+            meseroCamino: false,
+            hookstate: true,
+            esperaMesero: false,
+            idAlert: ''
+
         }
     },
     methods: {
+        obtenerDatosUsuario() {
+            try {
+                // Usa la función get para recuperar los datos del usuario por su clave
+                this.$storage.get('tokenInicioSesion')
+                    .then(userData => {
+                        if (userData) {
+                            // userData contiene los datos del usuario
+                            console.log('Datos del usuario:', userData);
+                            this.$store.state.datosUsuario = userData;
+                            this.$store.state.ipLocal = userData.ipLocal;
+                            this.ipLocal = userData.ipLocal;
+                            this.$store.state.numeroMesa = userData.numeroMesa;
+                            console.log(this.ipLocal)
+                        } else {
+                            console.log('No se encontraron datos de usuario.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al recuperar datos del usuario:', error);
+                    });
+            } catch (error) {
+                console.error('Error al recuperar datos del usuario:', error);
+            }
+        },
         alertaMesero() {
             this.pedirMesero = true;
             setTimeout(() => {
@@ -123,52 +196,187 @@ export default {
             const alerta = {
                 fkIdUsuario: this.$store.state.datosUsuario.id,
                 mesa: this.$store.state.numeroMesa,
-                estado: 'enviado'
+                estado: 'Alerta'
             }
             // console.log(alerta)
             const datosJSON = JSON.stringify(alerta);
             // console.log(datosJSON)
-            axios.post(`http://${this.ipLocal}/api/pedirmesero`, alerta)
+            axios.post(`${this.ipLocal}/pedirmesero`, alerta)
                 .then(response => {
                     if (response.data.code === 200) {
                         this.isOpen = state
                         this.alertaMesero()
+                        this.obtenerId()
+                        this.activarConsultaPeriodica()
+
                     }
                 })
                 .catch(error => console.log(error))
 
         },
-        getPedirMesero(){
-            axios.get(`http://${this.ipLocal}/api/mostrarMesero`)
-            .then(response =>{
-                const array = response.data.data
-                // if(response.data.data.estado === 'enviado' && response.data.data.fkIdUsuario === this.$store.state.datosUsuario.id){
+        obtenerId() {
+            var Estado = 'Alerta'
+            axios.get(`${this.ipLocal}/mostrarMesero/${Estado}`)
+                .then(response => {
+                    const array = response.data.data
+                    // if(response.data.data.estado === 'enviado' && response.data.data.fkIdUsuario === this.$store.state.datosUsuario.id){
+                    let idA = ''
+                    var id = this.$store.state.datosUsuario.id
+                    var mesa = this.$store.state.numeroMesa
+                    console.log('funv')
                     array.forEach(function (el, i) {
-                        if(el.estado === 'enviado'){
-                            console.log('funciona')
+                        if (el.mesa === mesa && el.fkIdUsuario === id) {
+                            idA = el.idPedirMesero
                         }
                     });
-                // }
-                
-            })
-            .catch(error => console.log(error))
+                    this.idAlert = idA
+
+                })
+                .catch(error => console.log(error))
+        },
+        getPedirMesero() {
+            var Estado = 'En camino'
+            axios.get(`${this.ipLocal}/mostrarMesero/${Estado}`)
+                .then(response => {
+                    const array = response.data.data
+                    // if(response.data.data.estado === 'enviado' && response.data.data.fkIdUsuario === this.$store.state.datosUsuario.id){
+                    var estado = false
+                    var id = this.$store.state.datosUsuario.id
+                    //    console.log('funv')
+                    array.forEach(function (el, i) {
+
+                        if (el.fkIdUsuario === id) {
+
+                            estado = true
+
+                        }
+                    });
+                    this.obtenerId()
+
+                    // alert(this.idAlert)
+
+                    if (estado === true) {
+                        this.desactivarConsultaPeriodica()
+                        this.meseroCamino = estado
+                    }
+
+
+                })
+                .catch(error => console.log(error))
+        },
+        // obtinene la fecha
+        obtenerFechaActual() {
+            const fecha = new Date();
+            const dia = fecha.getDate();
+            const mes = fecha.getMonth() + 1;
+            const anio = fecha.getFullYear();
+            this.fechaActual = `${anio}-${mes}-${dia}`;
+        },
+        esperaMeseroFuncion() {
+            this.meseroCamino = false;
+            setTimeout(() => {
+                this.meseroCamino = false;
+            }, 300000); // 300000 ms = 5 minutos
+        },
+        finalizarAlerta() {
+            var alerta = {
+                estado: 'espera'
+            }
+            var id = this.idAlert
+            // console.log(alerta)
+            const datosJSON = JSON.stringify(alerta);
+            axios.put(`${this.ipLocal}/pedirmesero/notificar/${id}`, alerta)
+                .then(response => {
+                    if (response.data.code === 200) {
+
+                        this.meseroCamino = false;
+                        setTimeout(() => {
+                            this.esperaMesero = true;
+                        }, 30000); // 3 minutos en milisegundos
+                        // Llama a esperaMeseroFuncion para iniciar la consulta periódica
+                        
+
+                    }
+
+                })
+                .catch(error => console.log(error))
+        },
+        desactivarConsultaPeriodica() {
+            this.hookstate = false;
+            clearInterval(this.pollingTimer);
+        },
+        terminar() {
+            var id = this.idAlert
+            axios.delete(`${this.ipLocal}/pedirmesero/destroy/${id}`)
+                .then(response => {
+                    if (response.data.code === 200) {
+                        this.esperaMesero = false
+                        this.desactivarConsultaPeriodica()
+                    }
+                })
+                .catch(error => console.log(error))
+        },
+        meseroNoLlego() {
+            var alerta = {
+                estado: 'Alerta'
+            }
+            var id = this.idAlert
+            // console.log(alerta)
+            const datosJSON = JSON.stringify(alerta);
+            axios.put(`${this.ipLocal}/pedirmesero/notificar/${id}`, alerta)
+                .then(response => {
+                    if (response.data.code === 200) {
+                        this.esperaMesero = false
+                        this.activarConsultaPeriodica()
+                    }
+
+                })
+                .catch(error => console.log(error))
+        },
+        activarConsultaPeriodica() {
+            this.hookstate = true;
+            this.pollingTimer = setInterval(this.getPedirMesero, 30000);
+            this.obtenerFechaActual();
         }
+
     },
     created() {
+        // this.desactivarConsultaPeriodica()
         // Configura una consulta periódica cada ciertos segundos (por ejemplo, cada 5 segundos)
-        this.pollingTimer = setInterval(this.getPedirMesero, 5000);
+        if (this.hookstate === true) {
+            this.pollingTimer = setInterval(this.getPedirMesero, 30000);
+            this.obtenerFechaActual();
+        }
+
     },
     beforeDestroy() {
-        // Limpia el temporizador cuando el componente se destruye para evitar fugas de memoria
-        clearInterval(this.pollingTimer);
+
+        if (this.hookstate === true) {
+            // Limpia el temporizador cuando el componente se destruye para evitar fugas de memoria
+            clearInterval(this.pollingTimer);
+        }
+
     },
     mounted() {
         console.log(this.$store.state.estadoSesion)
     },
     beforeCreate() {
-        if (this.$store.state.estadoSesion === false) {
-            this.$router.push('/inicio-sesion');
-        }
+        //Verificar si ya tenemos una sesión iniciada
+        this.$storage.get('tokenInicioSesion')
+            .then(token => {
+                if (!token) {
+                    //Si no tenemos sesión iniciada
+                    console.log('Inicia sesión o registrate!')
+                    this.$router.push('/scaner')
+                } else {
+                    // Si se encuentra un token, obtiene los datos del usuario
+                    this.obtenerDatosUsuario();
+                }
+            })
+            .catch(error => {
+                console.error('Error al verificar la sesión:', error);
+            });
+
     }
 }
 </script>
@@ -207,7 +415,7 @@ export default {
 .card-categorias {
     --ion-card-title-color: none;
     color: black;
-    background-color: #fefbd6;
+    background-color: white;
 }
 
 ion-card-title {

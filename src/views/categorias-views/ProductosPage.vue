@@ -16,20 +16,45 @@
         <ion-content class="fondo">
             <ion-grid>
                 <ion-row>
-                    <ion-col>
-                        <!-- Selecionar comida -->
-                        <ion-item class="select-categoria">
-                            <ion-select label="Categoria:" v-model="categoria" placeholder="Comidas">
-                                <ion-select-option value="Comidas">Comidas</ion-select-option>
-                                <ion-select-option value="Bebidas">Bebidas</ion-select-option>
-                                <ion-select-option value="Postres">Postres</ion-select-option>
-                                <ion-select-option value="Complementos">Complementos</ion-select-option>
-                            </ion-select>
-                        </ion-item>
+                    <ion-col size="12" class="ion-text-center">
+                        <ion-card style="--background: white;">
+                            <img src="/comprar-productos.webp">
+                            <ion-card-header>
+                                <ion-card-title style="color: black;">Comprar productos</ion-card-title>
+                            </ion-card-header>
+                            <ion-card-content>
+                                <!-- Selecionar comida -->
+                                <ion-item class="select-categoria">
+                                    <ion-select :disabled="botonCategoria" label="Categoria:" v-model="categoria"
+                                        placeholder="Comidas">
+                                        <ion-select-option value="Comidas">Comidas</ion-select-option>
+                                        <ion-select-option value="Bebidas">Bebidas</ion-select-option>
+                                        <ion-select-option value="Postres">Postres</ion-select-option>
+                                        <ion-select-option value="Complementos">Complementos</ion-select-option>
+                                    </ion-select>
+                                </ion-item>
+                            </ion-card-content>
+                        </ion-card>
                     </ion-col>
                 </ion-row>
 
-                <ion-row>
+                <ion-row v-if="cargandoProductos == true">
+                    <ion-col>
+                        <ion-card style="background-color: white;">
+                            <ion-card-header>
+                                <ion-card-title style="" class="ion-text-center">Cargando productos...</ion-card-title>
+                            </ion-card-header>
+
+                            <div
+                                style="height: 100%; display: flex; justify-content: center;align-items: center; padding-bottom: 15px;">
+                                <ion-spinner name="circular"></ion-spinner>
+                            </div>
+                        </ion-card>
+                    </ion-col>
+                </ion-row>
+
+                <!-- LISTADO DE PRODUCTOS -->
+                <ion-row v-else>
                     <ion-col size-xm="6" v-for="(producto, i) in productos" :key="i">
                         <!-- TARJETAS PRODUCTOS -->
                         <ion-card v-if="producto.categoria == categoria" class="card-productos">
@@ -87,12 +112,20 @@
                 </ion-content>
 
                 <ion-toolbar style="background-color: white;">
-                    <ion-button color="danger" slot="end" @click="modalInfo = false"><ion-icon aria-hidden="true" slot="start"
-                            :ios="close" :md="close"></ion-icon>Cerrar</ion-button>
+                    <ion-button color="danger" slot="end" @click="modalInfo = false"><ion-icon aria-hidden="true"
+                            slot="start" :ios="close" :md="close"></ion-icon>Cerrar</ion-button>
                     <ion-button color="success" slot="end" @click="agregarCarrito(modalInfoProducto)"><ion-icon
                             aria-hidden="true" slot="start" :ios="cart" :md="cart"></ion-icon>Agregar</ion-button>
                 </ion-toolbar>
             </ion-modal>
+
+            <!-- TOAST AGREGAR PRODUCTO -->
+            <ion-toast
+                message="Producto añadido al carrito"
+                position="top"
+                :duration="1000"
+                :isOpen="toastProductoAgregado"
+                @didDismiss="showToast(false)"></ion-toast>
 
         </ion-content>
 
@@ -111,7 +144,7 @@
 
 
 <script>
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonItem, IonFooter, IonModal, IonLabel, IonNote } from '@ionic/vue';
+import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonItem, IonFooter, IonModal, IonLabel, IonNote, IonSpinner, IonLoading, IonToast } from '@ionic/vue';
 
 import axios from 'axios';
 
@@ -120,7 +153,7 @@ import { cart, informationCircle, close } from 'ionicons/icons';
 export default {
     name: 'InicioPage',
     components: {
-        IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonItem, IonFooter, IonModal, IonLabel, IonNote
+        IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonItem, IonFooter, IonModal, IonLabel, IonNote, IonSpinner, IonLoading, IonToast
     },
     data() {
         return {
@@ -131,6 +164,10 @@ export default {
             productos: {},
             modalInfoProducto: {},
             modalInfo: false,
+            cargandoProductos: false,
+            botonCategoria: false,
+            cargandoAgregarProducto: false,
+            toastProductoAgregado: false
         }
     },
     methods: {
@@ -138,6 +175,9 @@ export default {
         verModalInfo(producto) {
             this.modalInfoProducto = producto
             this.modalInfo = true
+        },
+        showToast(state){
+            this.toastProductoAgregado = state
         },
         // Agregar al carrito
         agregarCarrito(producto) {
@@ -150,23 +190,73 @@ export default {
             }
             this.$store.dispatch('agregarCarritoAccion', datosCarrito)
             this.modalInfo = false
+
+            this.showToast(true)
         },
 
         // Obtenemos los plato según la categoria
         obtenerPlatos() {
-            axios.get(`http://${this.ipLocal}/api/platos/select/${this.categoria}`)
+            this.botonCategoria = true
+            this.cargandoProductos = true
+            axios.get(`${this.ipLocal}/platos/select/${this.categoria}`)
                 .then(response => {
+                    this.cargandoProductos = false
+                    this.botonCategoria = false
                     this.productos = response.data.data
                     console.log(response.data.data);
                 })
                 //Si ocurre un error se imprimirá en consola
                 .catch(error => {
                     console.error('OCURRIO UN ERROR: ', error);
+                    this.cargandoProductos = false
+                    this.botonCategoria = true
+                    this.$router.push('/inicio')
                 })
+        },
+        // Obtenemos datos del usuario con Ionic/Storage
+        obtenerDatosUsuario() {
+            try {
+                // Usa la función get para recuperar los datos del usuario por su clave
+                this.$storage.get('tokenInicioSesion')
+                .then(userData => {
+                    if (userData) {
+                        // userData contiene los datos del usuario
+                        console.log('Datos del usuario:', userData);
+                        this.$store.state.datosUsuario = userData;
+                    } else {
+                        console.log('No se encontraron datos de usuario.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al recuperar datos del usuario:', error);
+                });
+            } catch (error) {
+                console.error('Error al recuperar datos del usuario:', error);
+            }
         }
     },
-    mounted() {
+    beforeCreate(){
+        //Verificar si ya tenemos una sesión iniciada
+        this.$storage.get('tokenInicioSesion')
+            .then(token => {
+                if (!token) {
+                    //Si no tenemos sesión iniciada
+                    console.log('Inicia sesión o registrate!')
+                    this.$router.push('/scaner')
+                } else {
+                    // Si se encuentra un token, obtiene los datos del usuario
+                    this.obtenerDatosUsuario();
+                }
+            })
+            .catch(error => {
+                console.error('Error al verificar la sesión:', error);
+            });
+    },
+    created() {
         this.obtenerPlatos()
+    },
+    mounted() {
+
     },
     watch: {
         //este metodo comprueba que la operacion sea diferente para volver hacer el calculo
@@ -246,4 +336,5 @@ ion-toolbar {
     --background: none;
     background-color: #242424;
     text-align: center;
-}</style>
+}
+</style>

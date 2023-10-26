@@ -1,42 +1,44 @@
 <template>
   <ion-page class="barcode-scanner-page">
-    <ion-header>
-      <ion-toolbar color="danger">
-        <ion-title>Barcode Scanner</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <ion-content class="fondo">
+      <ion-header>
+        <ion-toolbar color="danger">
+          <ion-title>Barcode Scanner</ion-title>
+        </ion-toolbar>
+      </ion-header>
 
-    <ion-content class="ion-padding">
-      <div class="camera-container">
-        <div class="scan-frame">
-          <video ref="video" autoplay class="camera"></video>
-          <canvas ref="canvas" style="display: none;"></canvas>
+      <ion-content class="ion-padding">
+        <div class="camera-container">
+          <div class="scan-frame">
+            <video ref="video" autoplay class="camera"></video>
+            <canvas ref="canvas" style="display: none;"></canvas>
+          </div>
+          <div class="scan-result" v-if="scannedData">
+            <div class="scan-line" v-if="isScanning"></div>
+            <p class="scan-label">Resultado del escaneo:</p>
+            <p class="scan-data">{{ scannedData }}</p>
+
+          </div>
+          <p class="camera-error" v-if="cameraError">No has dado permisos a la cámara.</p>
         </div>
-        <div class="scan-result" v-if="scannedData">
-          <div class="scan-line" v-if="isScanning"></div>
-          <p class="scan-label">Resultado del escaneo:</p>
-          <p class="scan-data">{{ scannedData }}</p>
 
-        </div>
-        <p class="camera-error" v-if="cameraError">No has dado permisos a la cámara.</p>
-      </div>
-
-      <ion-grid>
-        <ion-row class="ion-align-items-center">
-          <ion-col>
-            <ion-button class="toggle-camera" @click="toggleCamera" v-if="isMobile">
-              <ion-icon :icon="isFrontCamera ? 'camera-reverse' : 'camera'"></ion-icon>
-              Cambiar Cámara
-            </ion-button>
-          </ion-col>
-          <ion-col>
-            <ion-button class="start-scan" @click="startScan" v-if="!isScanning">Iniciar Escaneo</ion-button>
-          </ion-col>
-          <ion-col>
-            <ion-button class="stop-scan" @click="stopScan" v-if="!isScanning">Detener Escaneo</ion-button>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+        <ion-grid>
+          <ion-row class="ion-align-items-center">
+            <ion-col>
+              <ion-button class="toggle-camera" @click="toggleCamera" v-if="isMobile">
+                <ion-icon :icon="isFrontCamera ? 'camera-reverse' : 'camera'"></ion-icon>
+                Cambiar Cámara
+              </ion-button>
+            </ion-col>
+            <ion-col>
+              <ion-button class="start-scan" @click="startScan" v-if="!isScanning">Iniciar Escaneo</ion-button>
+            </ion-col>
+            <ion-col>
+              <ion-button class="stop-scan" @click="stopScan" v-if="!isScanning">Detener Escaneo</ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-content>
     </ion-content>
   </ion-page>
 </template>
@@ -147,6 +149,15 @@ export default {
 </script>
 
 <style scoped>
+.fondo {
+  --background: none;
+  background-image: url('/FondoSesion.webp');
+
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 .barcode-scanner-page {
   background-color: #f5ea95;
   display: flex;

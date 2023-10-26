@@ -41,7 +41,8 @@
                                         <img alt="producto-imagen" :src="producto.imagen" />
                                     </ion-thumbnail>
                                     <ion-label>{{ producto.nombrePlato }}</ion-label>
-                                    <ion-label>${{ producto.precio }}</ion-label>
+                                    ${{ producto.precio }}
+                                    <ion-button @click="eliminarUnProducto(i)" color="danger" slot="end"><ion-icon :icon="trash"></ion-icon></ion-button>
                                 </ion-item>
                             </ion-card-content>
                         </ion-card>
@@ -85,7 +86,7 @@
             </ion-grid>
 
             <!-- ALERTA EN CASO NO HAYA PRODUCTOS EN EL CARRITO -->
-            <ion-alert
+            <ion-alert style="--background: white; --ion-text-color: black;"
                 :is-open="alertaCarrito"
                 :header="datosAlertaCarrito.header"
                 :message="datosAlertaCarrito.message"
@@ -93,24 +94,27 @@
                 @didDismiss="verAlertaCarrito(false)"
             ></ion-alert>
 
+            <!-- CARGANDO EDITACIÓN -->
+            <ion-loading :is-open="cargandoConfirmarCompra" trigger="open-loading" message="Confirmando compra..." style="--background: white; color: black;"></ion-loading>
+
         </ion-content>
     </ion-page>
 </template>
 
 
 <script>
-import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonLabel, IonItem, IonThumbnail, IonAlert } from '@ionic/vue';
+import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonLabel, IonItem, IonThumbnail, IonAlert, IonLoading } from '@ionic/vue';
 import axios from 'axios';
-import { cart } from 'ionicons/icons';
+import { cart, trash } from 'ionicons/icons';
 
 export default {
     name: 'InicioPage',
     components: {
-        IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonLabel, IonItem, IonThumbnail, IonAlert
+        IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonBackButton, IonList, IonLabel, IonItem, IonThumbnail, IonAlert, IonLoading
     },
     data() {
         return {
-            cart,
+            cart, trash,
 
             // carrito: this.$store.getters.getCarrito
 
@@ -125,6 +129,7 @@ export default {
                 message: '',
                 buttons: []
             },
+            cargandoConfirmarCompra: false
         }
     },
     methods: {
@@ -153,8 +158,11 @@ export default {
                 this.alertaCarrito = state;
             }
         },
-
+        eliminarUnProducto(index) {
+            this.$store.commit('eliminarUnProducto', index);
+        },
         mandarCocina() {
+            this.cargandoConfirmarCompra = true;
             this.pedido = {
                 detalles: this.$store.getters.getCarrito.map(producto => ({
                     fkIdPlato: producto.idPlato,
@@ -164,13 +172,15 @@ export default {
                 }))
             };
 
-            axios.post(`http://${this.ipLocal}/api/pedidos/store`, this.pedido)
+            axios.post(`${this.ipLocal}/pedidos/store`, this.pedido)
                 .then(response => {
+                    this.cargandoConfirmarCompra = false
                     this.verAlertaCarrito(true, "Compra exitosa!");
                     this.$router.push('/facturas')
                     console.log(response.data)
                 })
                 .catch(error => {
+                    this.cargandoConfirmarCompra = false
                     this.verAlertaCarrito(true, "Compra fallida!");
                     this.$router.push('/inicio');
                     console.error('OCURRIO UN ERROR: ', error);
@@ -178,7 +188,45 @@ export default {
         },
         confirmarPago() {
             this.$router.push('/facturas')
+        },
+        // Obtenemos datos del usuario con Ionic/Storage
+        obtenerDatosUsuario() {
+            try {
+                // Usa la función get para recuperar los datos del usuario por su clave
+                this.$storage.get('tokenInicioSesion')
+                .then(userData => {
+                    if (userData) {
+                        // userData contiene los datos del usuario
+                        console.log('Datos del usuario:', userData);
+                        this.$store.state.datosUsuario = userData;
+                    } else {
+                        console.log('No se encontraron datos de usuario.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al recuperar datos del usuario:', error);
+                });
+            } catch (error) {
+                console.error('Error al recuperar datos del usuario:', error);
+            }
         }
+    },
+    beforeCreate(){
+        //Verificar si ya tenemos una sesión iniciada
+        this.$storage.get('tokenInicioSesion')
+            .then(token => {
+                if (!token) {
+                    //Si no tenemos sesión iniciada
+                    console.log('Inicia sesión o registrate!')
+                    this.$router.push('/inicio-sesion')
+                } else {
+                    // Si se encuentra un token, obtiene los datos del usuario
+                    this.obtenerDatosUsuario();
+                }
+            })
+            .catch(error => {
+                console.error('Error al verificar la sesión:', error);
+            });
     },
     
 }

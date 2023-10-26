@@ -1,19 +1,37 @@
 <template>
   <ion-app>
     <ion-split-pane content-id="main-content">
-      <ion-menu side="end" content-id="main-content" type="overlay" v-if="(this.$store.state.stateInicio != false)">
+      <ion-menu side="end" content-id="main-content" type="overlay" :swipe-gesture="false">
         <ion-content>
           <ion-list id="inbox-list">
-            
-
-            <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
-              <ion-item @click="selectedIndex = i" router-direction="root" :router-link="p.url" lines="none" :detail="false" class="hydrated" :class="{ selected: selectedIndex === i }">
+            <ion-list-header>Productos</ion-list-header> <br>
+            <ion-menu-toggle :auto-hide="false" v-for="(p, i) in productosPage" :key="i">
+              <ion-item @click="setSelectedIndex(i + appPages.length)" router-direction="root" :router-link="p.url"
+                lines="none" :detail="false" class="hydrated">
                 <ion-icon aria-hidden="true" slot="start" :ios="p.iosIcon" :md="p.mdIcon"></ion-icon>
                 <ion-label>{{ p.title }}</ion-label>
               </ion-item>
             </ion-menu-toggle>
           </ion-list>
 
+          <ion-list id="inbox-list">
+            <ion-list-header>Cuenta</ion-list-header> <br>
+            <!-- <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
+              <ion-item @click="setSelectedIndex(i)" router-direction="root" :router-link="p.url" lines="none"
+                :detail="false" class="hydrated" :class="{ selected: selectedIndex === i }">
+                <ion-icon aria-hidden="true" slot="start" :ios="p.iosIcon" :md="p.mdIcon"></ion-icon>
+                <ion-label>{{ p.title }}</ion-label>
+              </ion-item>
+            </ion-menu-toggle> -->
+
+            <!-- CERRAR SESION -->
+            <ion-menu-toggle :auto-hide="false">
+              <ion-item @click="cerrarSesion">
+                <ion-icon aria-hidden="true" slot="start" :icon="logOut"></ion-icon>
+                <ion-label>Cerrar Sesión</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          </ion-list>
         </ion-content>
 
       </ion-menu>
@@ -24,15 +42,40 @@
 
 <script setup>
 import {
-  IonApp, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonMenuToggle, IonNote, IonRouterOutlet, IonSplitPane,
+  IonApp, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonMenuToggle, IonNote, IonRouterOutlet, 
+  IonSplitPane, IonModal, IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonSelect, IonSelectOption, IonFooter, IonThumbnail
 } from '@ionic/vue';
-import { ref } from 'vue';
+import { ref, onMounted, onUpdated } from 'vue';
 import {
-  home, archiveOutline, archiveSharp, fastFoodOutline, fastFoodSharp, bookmarkOutline, bookmarkSharp, heartOutline, heartSharp, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp,
+  home, person, personAdd, settings, document, addCircle, restaurant, logOut, qrCode, fastFoodOutline,
+fastFoodSharp, archiveOutline, archiveSharp
 } from 'ionicons/icons';
 
+import store from '@/store';
+import router from '@/router';
+
+// Importamos ionic/storage para cerrar sesión
+import { Storage } from '@ionic/storage';
+
+// Configuración de ionic/storage
+const storage = new Storage();
+storage.create().then(storageInstance => {
+});
+
+// Cerrar sesión con ionic/storage
+const cerrarSesion = async () => {
+  await storage.remove('tokenInicioSesion');
+  store.state.datosUsuario = [];
+  
+
+  router.push('/scaner')
+};
+
 const selectedIndex = ref(0);
-const appPages = [
+
+
+
+const productosPage = [
   {
     title: 'Inicio',
     url: '/inicio',
@@ -45,12 +88,6 @@ const appPages = [
     iosIcon: fastFoodOutline,
     mdIcon: fastFoodSharp,
   },
-  {
-    title: 'Cerrar Sesion',
-    url: '/folder/Archived',
-    iosIcon: archiveOutline,
-    mdIcon: archiveSharp,
-  },
   
 ];
 
@@ -58,11 +95,19 @@ const path = window.location.pathname.split('folder/')[1];
 if (path !== undefined) {
   selectedIndex.value = appPages.findIndex((page) => page.title.toLowerCase() === path.toLowerCase());
 }
+
+const setSelectedIndex = (index) => {
+  selectedIndex.value = index;
+};
+
 </script>
+
 
 <style scoped>
 ion-menu ion-content {
-  --background: var(--ion-item-background, var(--ion-background-color, #c93e4f));
+  /* --background: var(--ion-item-background, var(--ion-background-color, #c93e4f)); */
+  --background: none;
+  background-color: #c93e4f;
 }
 
 ion-menu.md ion-content {
@@ -70,11 +115,14 @@ ion-menu.md ion-content {
   --padding-end: 8px;
   --padding-top: 20px;
   --padding-bottom: 20px;
-  
+
 }
-ion-list{
+
+ion-list {
+  --background: none;
   background-color: #c93e4f;
 }
+
 ion-menu.md ion-list {
   padding: 20px 0;
 }
@@ -114,7 +162,8 @@ ion-menu.md ion-item {
   --padding-start: 10px;
   --padding-end: 10px;
   border-radius: 4px;
-  --background: #c93e4f;
+  --background: none;
+  background-color: #c93e4f;
 }
 
 ion-menu.md ion-item.selected {
