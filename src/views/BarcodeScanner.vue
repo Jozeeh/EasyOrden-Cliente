@@ -1,68 +1,46 @@
 <template>
-  <ion-page class="barcode-scanner-page">
-    <ion-content>
-      <ion-header>
-        <ion-toolbar color="danger">
-          <ion-title><img src="/EasyOrden-LogoBlancoSinFondo.png" alt=""></ion-title>
-        </ion-toolbar>
-      </ion-header>
+  <ion-page>
+    <ion-header>
+      <ion-toolbar color="danger" class="bgcolor-header ion-text-center">
+        <img src="/EasyOrden-LogoBlancoSinFondo.png" width="200">
+      </ion-toolbar>
+    </ion-header>
 
-      <ion-content class="ion-padding fondo">
+    <ion-content class="ion-padding fondo">
 
-        <ion-card class="card-qr">
-          <ion-card-content>
+      <ion-card class="card-qr">
+        <ion-card-content>
 
-            <div >
-              <video ref="video" autoplay class="camera"></video>
-              <canvas ref="canvas" style="display: none;"></canvas>
-            </div>
-            <!-- <div class="scan-result" v-if="scannedData">
-              <div class="scan-line" v-if="isScanning"></div> -->
-              <p class="camera-error" v-if="cameraError">No has dado permisos a la cámara.</p>
-              <!-- <p class="scan-label">Resultado del escaneo:</p> -->
-              <!-- <p class="scan-data">{{ scannedData }}</p> -->
-            <!-- </div> -->
-
-            <!-- botones -->
-            <ion-grid>
-          <ion-row class="ion-align-items-center">
-            <ion-col>
-              <ion-button class="toggle-camera" @click="toggleCamera" v-if="isMobile" color="warning">
-                <ion-icon :icon="isFrontCamera ? 'camera-reverse' : 'camera'"></ion-icon>
-                Cambiar Cámara
-              </ion-button>
-            </ion-col>
-            <ion-col>
-              <ion-button class="start-scan" @click="startScan" v-if="!isScanning" color="warning">Iniciar
-                Escaneo</ion-button>
-            </ion-col>
-            <ion-col>
-              <ion-button class="stop-scan" @click="stopScan" v-if="!isScanning" color="warning">Detener
-                Escaneo</ion-button>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-
-            <ion-button @click="descargarPDF" v-if="qrCodeUrl">Descargar PDF</ion-button>
-          </ion-card-content>
-        </ion-card>
-
-        <div class="camera-container">
-          <!-- <div class="scan-frame">
+          <div>
             <video ref="video" autoplay class="camera"></video>
             <canvas ref="canvas" style="display: none;"></canvas>
           </div>
-          <div class="scan-result" v-if="scannedData">
-            <div class="scan-line" v-if="isScanning"></div>
-            <p class="scan-label">Resultado del escaneo:</p>
-            <p class="scan-data">{{ scannedData }}</p>
+          <p class="camera-error" v-if="cameraError">No has dado permisos a la cámara.</p>
 
-          </div> -->
-         
-        </div>
+          <!-- botones -->
+          <ion-grid>
+            <ion-row class="ion-align-items-center">
+              <ion-col size="12">
+                <ion-button class="toggle-camera" @click="toggleCamera" v-if="isMobile" color="warning">
+                  <ion-icon :icon="isFrontCamera ? 'camera-reverse' : 'camera'"></ion-icon>
+                  Cambiar Cámara
+                </ion-button>
+              </ion-col>
+              <ion-col>
+                <ion-button class="start-scan" @click="startScan" v-if="!isScanning" color="warning">Iniciar
+                  Escaneo</ion-button>
+              </ion-col>
+              <ion-col>
+                <ion-button class="stop-scan" @click="stopScan" v-if="!isScanning" color="warning">Detener
+                  Escaneo</ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
 
-        
-      </ion-content>
+          <ion-button @click="descargarPDF" v-if="qrCodeUrl">Descargar PDF</ion-button>
+        </ion-card-content>
+      </ion-card>
+
     </ion-content>
   </ion-page>
 </template>
@@ -173,6 +151,7 @@ export default {
 </script>
 
 <style scoped>
+
 .card-qr {
   background-color: #ffffff;
   border-radius: 10px;
@@ -199,12 +178,10 @@ export default {
   background-color: rgba(14, 14, 14, 0.5);
 }
 
-.barcode-scanner-page {
-  background-color: #f5ea95;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
+/* ESTILOS HEADER */
+.bgcolor-header {
+    --background: #c93e4f;
+    --color: white;
 }
 
 .camera-container {
@@ -250,14 +227,6 @@ export default {
   color: #c93e4f;
   font-size: 18px;
   margin-top: 20px;
-}
-
-.toggle-camera,
-.start-scan,
-.stop-scan {
-  margin-top: 20px;
-  background-color: #c93e4f;
-  color: #fff;
 }
 
 @keyframes scan {
