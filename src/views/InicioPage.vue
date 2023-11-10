@@ -73,7 +73,7 @@
             <!-- Modal de alerta de que el mesero ya va en camino -->
             <ion-modal :is-open="meseroCamino">
                 <ion-header>
-                    <ion-toolbar>
+                    <ion-toolbar style="background: #c93e4f; color: white;">
                         <ion-title>Alerta</ion-title>
                         <ion-buttons slot="end">
                             <ion-button @click="finalizarAlerta()">Close</ion-button>
@@ -82,11 +82,16 @@
                 </ion-header>
                 <ion-content class="ion-padding fondo">
 
-                    <p style="color: white;">
-                    <h1 style="color: yellow; font-family: Arial">¡El mesero ya va en camino!</h1> <br>
-                    ¡Luego de 5 minutos se activar de nuevo el modal para que puedas confirmar si el mesero llego!
-                    </p>
-                    <img src="/camarero.png" alt="">
+                    <ion-card style="background: white;">
+                        <ion-card-header>
+                            <ion-card-title style="color: black;">¡El mesero ya va en camino!</ion-card-title>
+                        </ion-card-header>
+
+                        <ion-card-content style="color: black;">
+                            ¡Luego de 5 minutos se activar de nuevo el modal para que puedas confirmar si el mesero llego!
+                            <center><img style="margin-top: 20px;" src="/camarero.png" width="200"></center>
+                        </ion-card-content>
+                    </ion-card>
                 </ion-content>
 
             </ion-modal>
@@ -94,20 +99,23 @@
             <!-- Modal de alerta de que el mesero ya va en camino -->
             <ion-modal :is-open="esperaMesero">
                 <ion-header>
-                    <ion-toolbar>
+                    <ion-toolbar style="background: #c93e4f; color: white;">
                         <ion-title>Alerta</ion-title>
 
                     </ion-toolbar>
                 </ion-header>
                 <ion-content class="ion-padding fondo">
-                    
-                        <h1 style="color: white;">¿Ha llegado el mesero?</h1>
-                    
 
-                    <ion-button @click="terminar()" color="success">Finalizar</ion-button>
-                    <ion-button @click="meseroNoLlego()" color="warning">Mandar Nueva alerta</ion-button>
+                    <ion-card style="background: white;">
+                        <ion-card-header>
+                            <ion-card-title style="color: black;">¿El mesero ya llego?</ion-card-title>
+                        </ion-card-header>
 
-
+                        <ion-card-content>
+                            <ion-button color="success" @click="terminar()">Si llego</ion-button>
+                            <ion-button color="danger" @click="meseroNoLlego()">No llego</ion-button>
+                        </ion-card-content>
+                    </ion-card>
                 </ion-content>
             </ion-modal>
 
@@ -130,9 +138,7 @@
 <script>
 import {
     IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard,
-    IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonFooter,
-    IonItem, IonAlert,
-    IonThumbnail, IonNote, IonToast, IonModal
+    IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonFooter, IonItem, IonAlert, IonThumbnail, IonNote, IonToast, IonModal, IonLoading
 } from '@ionic/vue';
 
 import { cart } from 'ionicons/icons';
@@ -142,9 +148,7 @@ import axios from 'axios';
 export default {
     name: 'InicioPage',
     components: {
-        IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard,
-        IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonFooter,
-        IonItem, IonThumbnail, IonNote, IonAlert, IonToast, IonModal
+        IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonFooter, IonItem, IonThumbnail, IonNote, IonAlert, IonToast, IonModal, IonLoading
     },
     data() {
         return {
